@@ -4,14 +4,14 @@
 #include <string.h>
 
 char* get_toml_value(const char* toml_path, const char* key) {
-    // Load the TOML file
+
     FILE* file = fopen(toml_path, "r");
     if (!file) {
         fprintf(stderr, "Failed to open TOML file: %s\n", toml_path);
         return NULL;
     }
 
-    // Parse the TOML file
+
     char errbuf[200];
     toml_table_t* table = toml_parse_file(file, errbuf, sizeof(errbuf));
     fclose(file);
@@ -21,7 +21,6 @@ char* get_toml_value(const char* toml_path, const char* key) {
         return NULL;
     }
 
-    // Get the value for the specified key
     toml_raw_t raw = toml_raw_in(table, key);
     if (raw.ok) {
         char* result = strdup(raw.u.s);
