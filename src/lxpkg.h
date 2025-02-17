@@ -12,10 +12,8 @@
 #define PKG_CACHE "/var/cache/lxpkg/pkgs"
 #define REPO_URL "https://raw.githubusercontent.com/LearnixOS/lxos-repo/main"
 
-// Fetch TOML file from GitHub
 int fetch_toml(const char* pkgname, const char* dest_path);
 
-// Download source archive
 int download_source(const char* url, const char* dest_path);
 
 // Parse TOML and get value
