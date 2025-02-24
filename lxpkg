@@ -14,7 +14,7 @@ from rich.table import Table
 # Directories
 SOURCES_BASE_DIR = os.path.expanduser('/home/user/sources')  # Base directory for all package sources
 BUILD_DIR = os.path.expanduser('/home/user/sources/build')
-INSTALL_DIR = os.path.expanduser('/usr/local')
+INSTALL_DIR = os.path.expanduser('/usr/')
 
 console = Console()
 
