@@ -12,7 +12,7 @@ from rich.progress import Progress
 from rich.table import Table
 
 # Directories
-SOURCES_DIR = os.path.expanduser('/home/user/sources/core')
+SOURCES_DIR = os.path.expanduser('/home/user/sources/')
 BUILD_DIR = os.path.expanduser('/home/user/sources/build')
 INSTALL_DIR = os.path.expanduser('/usr/local')
 
