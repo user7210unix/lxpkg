@@ -12,7 +12,7 @@ from rich.progress import Progress
 from rich.table import Table
 
 # Directories
-SOURCES_DIR = os.path.expanduser('/home/user/sources/')
+SOURCES_BASE_DIR = os.path.expanduser('/home/user/sources')  # Base directory for all package sources
 BUILD_DIR = os.path.expanduser('/home/user/sources/build')
 INSTALL_DIR = os.path.expanduser('/usr/local')
 
@@ -36,6 +36,7 @@ def fetch_source(url, dest_dir):
     else:
         console.print(f"[bold green]{filename} already exists. Skipping download.[/bold green]")
     return filename
+
 
 def extract_tarball(tarball, dest_dir):
     """Extract a tarball and return the source directory."""
@@ -65,10 +66,13 @@ def extract_tarball(tarball, dest_dir):
         if matching_dirs:
             return matching_dirs[0]
         else:
-            raise Exception("Multiple directories found, but none match the package name.")
+            # If no match, return the first directory (or handle as needed)
+            console.print(f"[bold yellow]Warning: Multiple directories found. Using the first one: {extracted_dirs[0]}[/bold yellow]")
+            return extracted_dirs[0]
     else:
         # If no directories, return the destination directory itself
         return dest_dir
+
 
 def build_package(src_dir, commands):
     """Build the package using the provided commands."""
@@ -80,12 +84,12 @@ def build_package(src_dir, commands):
             raise Exception(f"Command '{command}' failed.")
 
 def find_package_toml(package_name):
-    """Find the TOML file for the given package."""
-    for root, _, files in os.walk(SOURCES_DIR):
+    """Find the TOML file for the given package in any subdirectory under SOURCES_BASE_DIR."""
+    for root, _, files in os.walk(SOURCES_BASE_DIR):
         for file in files:
             if file.endswith('.toml') and package_name in file:
                 return os.path.join(root, file)
-    raise Exception(f"Package '{package_name}' not found.")
+    raise Exception(f"Package '{package_name}' not found in {SOURCES_BASE_DIR}.")
 
 def install_package(package_name):
     """Install a package."""
@@ -95,7 +99,7 @@ def install_package(package_name):
     build = package_info['build']
 
     # Fetch and extract source
-    tarball = fetch_source(package['src'][0], SOURCES_DIR)
+    tarball = fetch_source(package['src'][0], os.path.dirname(toml_path))  # Use the directory of the TOML file
     src_dir = extract_tarball(tarball, BUILD_DIR)
     console.print(f"[bold cyan]Using source directory: {src_dir}[/bold cyan]")
 
@@ -110,18 +114,19 @@ def install_package(package_name):
     console.print(Panel("[bold green]✔ Installation Complete![/bold green]", style="green"))
 
 def search_packages(query):
-    """Search for packages matching the query."""
+    """Search for packages matching the query in any subdirectory under SOURCES_BASE_DIR."""
     console.print(f"[bold cyan]Searching for packages containing '{query}'...[/bold cyan]")
     matches = []
-    for root, _, files in os.walk(SOURCES_DIR):
+    for root, _, files in os.walk(SOURCES_BASE_DIR):
         for file in files:
             if file.endswith('.toml') and query in file:
                 matches.append(file)
     if matches:
         table = Table(title="Matching Packages")
         table.add_column("Package Name", style="cyan")
+        table.add_column("Location", style="magenta")
         for match in matches:
-            table.add_row(match)
+            table.add_row(match, os.path.dirname(match))
         console.print(table)
     else:
         console.print("[bold yellow]No matching packages found.[/bold yellow]")
