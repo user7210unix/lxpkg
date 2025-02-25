@@ -2,7 +2,7 @@
   <h2 style="font-size: 54px;">
     <strong>
       <a href="https://learnixos.github.io/" style="text-decoration: none; color: inherit;">
-        <img src="https://learnixos.github.io/assets/images/logo.png" alt="" style="vertical-align: middle; width: 24px; height: 24px; margin-right: 8px;">
+        <img src="https://learnixos.github.io/assets/images/logo.png" alt="" style="vertical-align: middle; width: 54px; height: 54px; margin-right: 8px;">
         In collaboration with the LearnixOS team
       </a>
     </strong>
