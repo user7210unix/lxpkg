@@ -6,12 +6,12 @@
 }
 
 @font-face {
-    font-family: 'Altroned';
-    src: url('assets/fonts/AUTOMATA.ttf') format('truetype');
+    font-family: 'vipnagorgialla';
+    src: url('assets/fonts/vipnagorgialla.otf') format('truetype');
 }
 
 body {
-    font-family: 'Altroned', sans-serif;
+    font-family: 'vipnagorgialla', sans-serif;
     background: url('assets/images/background1.png') no-repeat center center fixed;
     background-size: cover;
     color: #f4f4f4;
