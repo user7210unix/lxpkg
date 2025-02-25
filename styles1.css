@@ -82,13 +82,12 @@ header {
 }
 
 .image img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transform: scale(1.09);
 }
 
 .image img {
     width: 100%;
-    max-width: 700px;
+    max-width: 900px;
     height: auto;
     border-radius: 10px;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
