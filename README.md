@@ -15,13 +15,6 @@
     </strong>
   </h2>
 
-<div align="center">
-
-### 𝙄𝙣𝙨𝙩𝙖𝙡𝙡𝙖𝙩𝙞𝙤𝙣 🍃
-
-```
-curl -fsSL https://raw.githubusercontent.com/user7210unix/lxpkg/main/install.sh | bash
-```
 
 
 <h1>
@@ -53,6 +46,17 @@ curl -fsSL https://raw.githubusercontent.com/user7210unix/lxpkg/main/install.sh 
       <img src="assets/images/2.png" align="center" alt=" Preview" width="550" style="display: block; margin: 32px auto; border: 2px solid #555; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);">
 </div>
 </div> 
+
+
+<div align="center">
+
+### 𝙄𝙣𝙨𝙩𝙖𝙡𝙡𝙖𝙩𝙞𝙤𝙣 🍃
+
+```
+curl -fsSL https://raw.githubusercontent.com/user7210unix/lxpkg/main/install.sh | bash
+```
+
+
 
 
 ### :octocat: ‎ <sup><sub><samp>HI THERE! THANKS FOR DROPPING BY!</samp></sub></sup>
