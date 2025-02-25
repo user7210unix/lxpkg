@@ -6,12 +6,12 @@
 }
 
 @font-face {
-    font-family: 'vipnagorgialla';
-    src: url('assets/fonts/vipnagorgialla.otf') format('truetype');
+    font-family: 'overcame';
+    src: url('assets/fonts/overcame.ttf') format('truetype');
 }
 
 body {
-    font-family: 'vipnagorgialla', sans-serif;
+    font-family: 'overcame', sans-serif;
     background: url('assets/images/background1.png') no-repeat center center fixed;
     background-size: cover;
     color: #f4f4f4;
