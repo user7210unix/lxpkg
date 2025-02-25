@@ -60,5 +60,5 @@ curl -fsSL https://raw.githubusercontent.com/user7210unix/lxpkg/main/install.sh 
 
 
 
-### :octocat: ‎ <sup><sub><samp>HI THERE! THANKS FOR DROPPING BY!</samp></sub></sup>
+### :octocat: ‎ <sup><sub><samp>STILL EARLY IN DEVELOPMENT!</samp></sub></sup>
 
