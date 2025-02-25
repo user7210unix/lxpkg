@@ -38,15 +38,6 @@ header {
     margin-bottom: 40px;
 }
 
-.github-link:hover {
-        color:#fff;
-}
-
-.github-link {
-    right: 50px;
-}
-
-
 .banner {
     display: block;
     max-width: 600px;
