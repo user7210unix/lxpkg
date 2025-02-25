@@ -12,7 +12,7 @@
 
 body {
     font-family: 'Altroned', sans-serif;
-    background: url('https://raw.githubusercontent.com/user7210unix/lxpkg/refs/heads/main/assets/images/background1.png') no-repeat center center fixed;
+    background: url('assets/images/background1.png') no-repeat center center fixed;
     background-size: cover;
     color: #f4f4f4;
     line-height: 1.2;
