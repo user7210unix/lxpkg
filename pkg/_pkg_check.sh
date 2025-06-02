@@ -18,9 +18,6 @@ pkg_check_system() {
         xorg-server)
             [ -f "/usr/bin/Xorg" ] || [ -f "/usr/lib/xorg/Xorg" ] && { log "$pkg detected, skipping"; return 0; }
             ;;
-        libreoffice)
-            [ -d "/opt/libreoffice" ] || [ -f "/usr/bin/libreoffice" ] && { log "$pkg detected in /opt or /usr/bin, skipping"; return 0; }
-            ;;
         sed|grep|procps-ng)
             for path in /bin /usr/bin; do
                 [ -x "$path/$pkg" ] && { log "$pkg detected at $path/$pkg, marking as system-installed"; mkdir -p "$sys_db/$pkg"; printf 'system system\n' > "$sys_db/$pkg/version"; return 0; }
