@@ -1,0 +1,30 @@
+# lxpkg configuration file example
+# Copy this to /etc/lxpkg.conf and modify as needed.
+
+# LXPKG_PATH: Colon-separated list of directories where lxpkg should look for package definitions.
+# This is where your package repositories are located.
+LXPKG_PATH=/usr/src/lxpkg/repo
+
+# LXPKG_COMPRESS: Default compression format for cached packages.
+# Supported: xz, gz, bz2. (Used when creating cache, not strictly for reading existing archives)
+LXPKG_COMPRESS=xz
+
+# LXPKG_SKIP_CHECKSUMS: Set to 1 to skip checksum verification during installation.
+# Set to 0 (default) to enable checksum verification.
+LXPKG_SKIP_CHECKSUMS=0
+
+# LXPKG_STRIP: Set to 1 to strip binaries and libraries after installation (reduces size).
+# Set to 0 to disable stripping.
+LXPKG_STRIP=1
+
+# LXPKG_COLOR: Set to 1 to enable ANSI color output.
+# Set to 0 to disable color.
+LXPKG_COLOR=1
+
+# LXPKG_VERBOSE: Set to 1 to enable verbose logging.
+# Set to 0 for normal output.
+LXPKG_VERBOSE=0
+
+# LXPKG_ROOT: The root directory where packages will be installed.
+# Default is / (system root). Useful for chroots or testing.
+# LXPKG_ROOT=/

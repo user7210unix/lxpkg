@@ -1,0 +1,177 @@
+#!/bin/sh
+# lxpkg: package manager for lxos (https://learnixos.github.io)
+# Version: 1.2.7
+
+# Exit on errors
+set -e
+
+# Source core libraries
+. "$(dirname "$0")/lib/_colors.sh"
+. "$(dirname "$0")/lib/_logger.sh"
+. "$(dirname "$0")/lib/_utils.sh"
+. "$(dirname "$0")/lib/_config.sh"
+. "$(dirname "$0")/lib/_globals.sh"
+
+# Source package management functions
+. "$(dirname "$0")/pkg/_pkg_common.sh"
+. "$(dirname "$0")/pkg/_pkg_check.sh"
+. "$(dirname "$0")/pkg/_pkg_cache.sh"
+. "$(dirname "$0")/pkg/_pkg_update.sh"
+. "$(dirname "$0")/pkg/_pkg_checksums.sh"
+. "$(dirname "$0")/pkg/_pkg_search.sh"
+. "$(dirname "$0")/pkg/_pkg_remove.sh"
+. "$(dirname "$0")/pkg/_pkg_depends.sh"
+. "$(dirname "$0")/pkg/_pkg_sources.sh"
+. "$(dirname "$0")/pkg/_pkg_build.sh"
+. "$(dirname "$0")/pkg/_pkg_install.sh"
+. "$(dirname "$0")/pkg/_pkg_list.sh"
+
+# Load configuration
+create_default_conf # Ensure default config exists
+. /etc/lxpkg.conf # Load user configuration
+
+# Apply color settings
+if [ "${LXPKG_COLOR:-1}" -eq 0 ]; then
+    c_reset='' c_grey='' c_green='' c_cyan='' c_purple='' c_yellow='' c_red='' c_blue=''
+fi
+
+# Initialize global paths after config is loaded
+LXPKG_ROOT="${BOOTSTRAP_LXPKG:-${LXPKG_ROOT:-/}}"
+sys_db="$LXPKG_ROOT/var/db/lxpkg/installed"
+cache_dir="$LXPKG_ROOT/var/cache/lxpkg"
+src_dir="$LXPKG_ROOT/var/src/lxpkg"
+bld_dir="$LXPKG_ROOT/var/tmp/lxpkg"
+pkg_dir="$LXPKG_ROOT/var/tmp/lxpkg"
+pkg_db="var/db/lxpkg"
+sys_ch="$LXPKG_ROOT/var/db/lxpkg/alternatives"
+cho_db="/var/db/lxpkg/alternatives" # Used in pkg_swap to represent path in manifest
+
+# Main logic
+main() {
+    local cmd="$1"
+    shift || : # Shift if arguments exist
+
+    case "$cmd" in
+        install|i)
+            [ "$#" -eq 0 ] && die "Usage: lxpkg install <package(s)>"
+            for pkg in "$@"; do
+                pkg_resolve_deps "$pkg" # Resolve and install dependencies first
+                pkg_install "$pkg"
+            done
+            ;;
+        remove|r)
+            [ "$#" -eq 0 ] && die "Usage: lxpkg remove <package(s)>"
+            for pkg in "$@"; do
+                pkg_remove "$pkg"
+            done
+            ;;
+        update|u)
+            pkg_update
+            ;;
+        search|s)
+            pkg_search "$@"
+            ;;
+        list|l)
+            pkg_list
+            ;;
+        clean)
+            pkg_clean_cache
+            ;;
+        autoremove|ar)
+            warn "Autoremove functionality is not yet implemented."
+            ;;
+        show|sh)
+            [ "$#" -eq 0 ] && die "Usage: lxpkg show <package>"
+            pkg_show "$1" # New function to show package info
+            ;;
+        alternatives|alt)
+            if [ "$#" -eq 0 ]; then
+                pkg_alternatives
+            elif [ "$#" -eq 2 ] && [ "$1" != "-" ]; then
+                pkg_swap "$1" "$2"
+            else
+                die "Usage: lxpkg alternatives [pkg path] or lxpkg alternatives"
+            fi
+            ;;
+        help|h)
+            usage
+            ;;
+        version|v)
+            printf "lxpkg version 1.2.7\n"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+}
+
+usage() {
+    printf "Usage: lxpkg <command> [options]\n"
+    printf "Commands:\n"
+    printf "  install <package(s)> (i) - Install packages\n"
+    printf "  remove <package(s)> (r)  - Remove packages\n"
+    printf "  update (u)                - Update package repositories\n"
+    printf "  search [term] (s)         - Search for packages\n"
+    printf "  list (l)                  - List installed packages\n"
+    printf "  clean                     - Clean package cache\n"
+    printf "  autoremove (ar)           - Remove unneeded dependencies (Not implemented)\n"
+    printf "  show <package> (sh)       - Show package information\n"
+    printf "  alternatives [pkg path]   - Manage file alternatives\n"
+    printf "  help (h)                  - Show this help message\n"
+    printf "  version (v)               - Show version information\n"
+    exit 1
+}
+
+# New function: Show package information
+pkg_show() {
+    local pkg="$1"
+    pkg_find "$pkg" || die "Package '$pkg' not found in repositories."
+
+    log "Information for $c_cyan$pkg$c_reset:"
+    pkg_find_version "$pkg" # Sets repo_ver and repo_rel
+    printf "  %bVersion:%b %s-%s\n" "$c_grey" "$c_green" "$repo_ver" "$repo_rel"
+    printf "  %bRepository Path:%b %s\n" "$c_grey" "$c_purple" "$repo_dir"
+
+    if pkg_is_installed "$pkg"; then
+        read -r installed_ver installed_rel < "$sys_db/$pkg/version" 2>/dev/null
+        printf "  %bInstalled:%b %s-%s\n" "$c_grey" "$c_green" "$installed_ver" "$installed_rel"
+    elif pkg_check_system "$pkg" >/dev/null 2>&1; then # Suppress output from check_system
+        printf "  %bStatus:%b %s\n" "$c_grey" "$c_green" "System-installed"
+    else
+        printf "  %bStatus:%b %s\n" "$c_grey" "$c_yellow" "Not installed"
+    fi
+
+    # Display dependencies
+    if [ -f "$repo_dir/depends" ]; then
+        printf "  %bDependencies:%b\n" "$c_grey"
+        while read -r dep dep_type || [ -n "$dep" ]; do
+            [ "${dep##\#*}" ] || continue
+            local status=""
+            if pkg_is_installed "$dep"; then
+                status="${c_green}Installed${c_reset}"
+            elif pkg_check_system "$dep" >/dev/null 2>&1; then
+                status="${c_green}System-installed${c_reset}"
+            elif ! pkg_find "$dep" "" "" "$LXPKG_PATH" >/dev/null 2>&1; then
+                status="${c_red}Missing${c_reset}"
+            else
+                status="${c_yellow}Not installed${c_reset}"
+            fi
+            printf "    - %b%s%b (%s - %s)\n" "$c_cyan" "$dep" "$c_reset" "$dep_type" "$status"
+        done < "$repo_dir/depends"
+    else
+        printf "  %bDependencies:%b None\n" "$c_grey"
+    fi
+
+    # Display sources
+    if [ -f "$repo_dir/sources" ]; then
+        printf "  %bSources:%b\n" "$c_grey"
+        while read -r url file || [ -n "$url" ]; do
+            [ -z "$url" ] && continue
+            printf "    - %b%s%b\n" "$c_purple" "$url" "$c_reset"
+        done < "$repo_dir/sources"
+    else
+        printf "  %bSources:%b None\n" "$c_grey"
+    fi
+}
+
+main "$@"
